@@ -67,6 +67,8 @@ impl SimpleState for Menu {
       }) => {
         if let Some(_) = self.button_host {
           if let Ok(listener) = TcpListener::bind("0.0.0.0:9898") {
+            listener.set_nonblocking(true).unwrap();
+
             world
               .fetch_mut::<TcpNetworkResource>()
               .set_listener(listener);
