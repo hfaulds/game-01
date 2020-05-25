@@ -2,14 +2,17 @@ use amethyst::{
   audio::AudioBundle,
   core::transform::TransformBundle,
   input::{InputBundle, StringBindings},
+  network::simulation::tcp::TcpNetworkBundle,
   prelude::*,
   renderer::{plugins::RenderToWindow, types::DefaultBackend, RenderingBundle},
   ui::{RenderUi, UiBundle},
   utils::application_root_dir,
 };
 
-mod lobby;
-mod menu;
+extern crate log;
+
+mod states;
+mod systems;
 
 fn main() -> amethyst::Result<()> {
   amethyst::start_logger(Default::default());
@@ -33,9 +36,11 @@ fn main() -> amethyst::Result<()> {
     .with_bundle(InputBundle::<StringBindings>::new())?
     .with_bundle(UiBundle::<StringBindings>::new())?
     .with_bundle(AudioBundle::default())?
+    .with_bundle(TcpNetworkBundle::new(None, 2048))?
+    .with_system_desc(crate::systems::server::ServerSystemDesc::default(), "server_system", &[])
     ;
 
-  let mut game = Application::new(assets_dir, crate::menu::Menu::default(), game_data)?;
+  let mut game = Application::new(assets_dir, states::menu::Menu::default(), game_data)?;
   game.run();
 
   Ok(())

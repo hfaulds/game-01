@@ -1,10 +1,15 @@
 use amethyst::{
   ecs::prelude::Entity,
   input::{is_close_requested, is_key_down},
+  network::simulation::tcp::TcpNetworkResource,
   prelude::*,
-  ui::{UiEvent, UiEventType, UiCreator, UiFinder},
+  ui::{UiCreator, UiEvent, UiEventType, UiFinder},
   winit::VirtualKeyCode,
 };
+
+use std::net::TcpListener;
+
+use log::{error, info};
 
 const BUTTON_HOST: &str = "host";
 const BUTTON_JOIN: &str = "join";
@@ -28,7 +33,6 @@ impl SimpleState for Menu {
   }
 
   fn update(&mut self, state_data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
-    // only search for buttons if they have not been found yet
     let StateData { world, .. } = state_data;
 
     if self.button_host.is_none() || self.button_join.is_none() || self.input_host.is_none() {
@@ -42,7 +46,13 @@ impl SimpleState for Menu {
     Trans::None
   }
 
-  fn handle_event(&mut self, _: StateData<'_, GameData<'_, '_>>, event: StateEvent) -> SimpleTrans {
+  fn handle_event(
+    &mut self,
+    state_data: StateData<'_, GameData<'_, '_>>,
+    event: StateEvent,
+  ) -> SimpleTrans {
+    let StateData { world, .. } = state_data;
+
     match &event {
       StateEvent::Window(event) => {
         if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
@@ -56,7 +66,16 @@ impl SimpleState for Menu {
         target: _,
       }) => {
         if let Some(_) = self.button_host {
-          return Trans::Switch(Box::new(crate::lobby::Lobby::default()));
+          if let Ok(listener) = TcpListener::bind("0.0.0.0:9898") {
+            world
+              .fetch_mut::<TcpNetworkResource>()
+              .set_listener(listener);
+            let lobby = crate::states::lobby::Lobby::default();
+            info!("switching to lobby");
+            return Trans::Switch(Box::new(lobby));
+          } else {
+            error!("Error creating tcp server");
+          }
         }
         Trans::None
       }

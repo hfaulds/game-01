@@ -6,13 +6,16 @@ use amethyst::{
   winit::VirtualKeyCode,
 };
 
-#[derive(Default, Debug)]
+use log::info;
+
+#[derive(Debug,Default)]
 pub struct Lobby {
   ui_handle: Option<Entity>,
 }
 
 impl SimpleState for Lobby {
   fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+    info!("start lobby");
     let world = data.world;
 
     self.ui_handle =
@@ -27,6 +30,8 @@ impl SimpleState for Lobby {
         } else {
           Trans::None
         }
+        // Listen for game start button click
+        // Create dispatcher for simulating the game
       }
 
       _ => Trans::None,
