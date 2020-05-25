@@ -1,5 +1,4 @@
 #![enable(implicit_some)]
-// Detailed field information can be found at https://docs.amethyst.rs/master/amethyst_ui/enum.UiWidget.html and related pages
 Container(
     transform: (
         id: "background",
@@ -95,7 +94,7 @@ Container(
                             height: 145.,
                             tab_order: 3,
                             anchor: MiddleRight,
-                pivot: MiddleRight,
+                            pivot: MiddleRight,
                             mouse_reactive: true,
                         ),
                         button: (

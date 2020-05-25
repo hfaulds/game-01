@@ -8,6 +8,7 @@ use amethyst::{
   utils::application_root_dir,
 };
 
+mod lobby;
 mod menu;
 
 fn main() -> amethyst::Result<()> {
